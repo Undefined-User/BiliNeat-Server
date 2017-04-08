@@ -6,6 +6,19 @@ from flask import Flask, request, make_response
 
 from config import Config
 
+
+class OriginalConfigParser(configparser.ConfigParser):
+    """
+    重写 optionxform() 解决智障 ConfigParser 不区分大小写...
+    """
+
+    def __init__(self):
+        configparser.ConfigParser.__init__(self)
+
+    def optionxform(self, optionstr):
+        return optionstr
+
+
 app = Flask(__name__)
 app.config.from_object(Config())
 
@@ -21,7 +34,7 @@ def get_content(version):
 
     if filename in listdir:
         # 有适配文件
-        parser = configparser.ConfigParser()
+        parser = OriginalConfigParser()
         parser.read(os.path.join(static_folder, filename), encoding='utf-8')
 
         list_content = parser.items(app.config['ADAPTER_FILE_SECTIONS'])
