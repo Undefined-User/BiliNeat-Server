@@ -1,4 +1,5 @@
 import configparser
+import json
 import os
 
 from flask import Flask, request, make_response
@@ -28,13 +29,23 @@ def get_content(version):
 
 
 def make_json(content):
-    pass
+    if content is not None:
+        json_text = json.dumps({'code': 200, 'hook_info': content})
+        return json_text
+    else:
+        json_text = json.dumps({'code': 404, 'message': 'Adapter file not found'})
+        return json_text
+
+
+def add_json_header(agrs):
+    response = make_response(agrs)
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
 
 
 @app.route('/bilineat/version')
 def newest_version():
-    response = make_response(app.config['BILINEAT_NEWEST_VERSION'])
-    response.headers['Content-Type'] = 'text/html;charset=utf-8'
+    response = add_json_header(app.config['BILINEAT_NEWEST_VERSION'])
     return response
 
 
@@ -42,9 +53,9 @@ def newest_version():
 def get_adapter_file():
     bili_version = request.args.get('bili')
     dict_content = get_content(bili_version)
-    make_json(dict_content)
 
-    return '111111111111'
+    response = add_json_header(make_json(dict_content))
+    return response
 
 
 if __name__ == '__main__':
