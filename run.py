@@ -43,8 +43,13 @@ def get_content(version):
 
 def make_json(content):
     if content is not None:
-        json_text = json.dumps({'code': 200, 'hook_info': content})
+        official_version = content['officialVersion']
+        # 移除原 dict 里的 key
+        content.pop('officialVersion')
+
+        json_text = json.dumps({'code': 200, 'officialVersion': official_version, 'hook_info': content})
         return json_text
+
     else:
         json_text = json.dumps({'code': 404, 'message': 'Adapter file not found'})
         return json_text
