@@ -22,7 +22,13 @@ def get_content(version):
         # 有适配文件
         parser = configparser.ConfigParser()
         parser.read(os.path.join(static_folder, filename), encoding='utf-8')
-        print(parser.items(app.config['ADAPTER_FILE_SECTIONS']))
+
+        list_content = parser.items(app.config['ADAPTER_FILE_SECTIONS'])
+        return dict(list_content)
+
+
+def make_json(content):
+    pass
 
 
 @app.route('/bilineat/version')
@@ -35,7 +41,9 @@ def newest_version():
 @app.route('/bilineat/adapterfile')
 def get_adapter_file():
     bili_version = request.args.get('bili')
-    get_content(bili_version)
+    dict_content = get_content(bili_version)
+    make_json(dict_content)
+
     return '111111111111'
 
 
