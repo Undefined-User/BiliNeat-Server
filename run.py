@@ -22,7 +22,7 @@ def get_content(version):
         # 有适配文件
         parser = configparser.ConfigParser()
         parser.read(os.path.join(static_folder, filename), encoding='utf-8')
-        print(parser.get('BiliNeat Adapter File', 'onlineHelper'))
+        print(parser.items(app.config['ADAPTER_FILE_SECTIONS']))
 
 
 @app.route('/bilineat/version')
