@@ -3,7 +3,10 @@ import os
 
 from flask import Flask, request, make_response
 
+from config import Config
+
 app = Flask(__name__)
+app.config.from_object(Config())
 
 
 def get_content(version):
@@ -24,7 +27,7 @@ def get_content(version):
 
 @app.route('/bilineat/version')
 def newest_version():
-    response = make_response('1.9.4')
+    response = make_response(app.config['BILINEAT_NEWEST_VERSION'])
     response.headers['Content-Type'] = 'text/html;charset=utf-8'
     return response
 
