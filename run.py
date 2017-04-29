@@ -63,7 +63,8 @@ def add_json_header(agrs):
 
 @app.route('/bilineat/version')
 def newest_version():
-    response = add_json_header(app.config['BILINEAT_NEWEST_VERSION'])
+    file = open(os.path.join(app.static_folder, 'newest'))
+    response = add_json_header(file.read())
     return response
 
 
