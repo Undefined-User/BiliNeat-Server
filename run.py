@@ -1,5 +1,6 @@
 import configparser
 import os
+import re
 
 from flask import Flask, request, make_response, jsonify
 
@@ -41,7 +42,7 @@ def get_not_found_response():
     return jsonify(json_dict)
 
 
-@app.route('/bilineat/version')
+@app.route('/bilineat/neatversion')
 def newest_version():
     file = open(os.path.join(app.static_folder, 'newest'))
 
@@ -51,7 +52,7 @@ def newest_version():
     return response
 
 
-@app.route('/bilineat/adapterfile')
+@app.route('/bilineat/configfile')
 def get_adapter_file():
     bili_version = request.args.get('bili')
     if bili_version is None:
@@ -69,6 +70,23 @@ def get_adapter_file():
         content_dict = {'code': 200, 'officialVersion': official_version, 'hookInfo': content_dict}
 
         return jsonify(content_dict)
+
+
+@app.route('/bilineat/adaptedversion')
+def get_adapted_version():
+    listdir = os.listdir(app.static_folder)
+
+    regex = re.compile(r'adapter_(.+).cfg')
+    adapted_list = []
+
+    for name in listdir:
+        if name != 'newest':
+            pure_version = re.findall(regex, name)[0]
+            adapted_list.append(pure_version)
+
+    content_dict = {'code': 200, 'adaptedVersion': adapted_list}
+
+    return jsonify(content_dict)
 
 
 if __name__ == '__main__':
