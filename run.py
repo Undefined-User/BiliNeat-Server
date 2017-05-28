@@ -1,15 +1,14 @@
 import configparser
-import json
 import os
 
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, jsonify
 
 from config import Config
 
 
 class OriginalConfigParser(configparser.ConfigParser):
     """
-    重写 optionxform() 解决智障 ConfigParser 不区分大小写...
+    重写 optionxform() 解决 ConfigParser 不区分大小写，MDZZ... 
     """
 
     def __init__(self):
@@ -24,10 +23,6 @@ app.config.from_object(Config())
 
 
 def get_content(version):
-    # 版本号都是没有还查个毛线
-    if version is None:
-        return None
-
     static_folder = str(app.static_folder)
     filename = 'adapter_' + version + '.cfg'
     listdir = os.listdir(static_folder)
@@ -41,18 +36,9 @@ def get_content(version):
         return dict(list_content)
 
 
-def make_json(content):
-    if content is not None:
-        official_version = content['officialVersion']
-        # 移除原 dict 里的 key
-        content.pop('officialVersion')
-
-        json_text = json.dumps({'code': 200, 'officialVersion': official_version, 'hook_info': content})
-        return json_text
-
-    else:
-        json_text = json.dumps({'code': 404, 'message': 'Adapter file not found'})
-        return json_text
+def get_not_found_response():
+    json_dict = {'code': 404, 'message': 'Adapter file not found'}
+    return jsonify(json_dict)
 
 
 def add_json_header(agrs):
@@ -71,10 +57,21 @@ def newest_version():
 @app.route('/bilineat/adapterfile')
 def get_adapter_file():
     bili_version = request.args.get('bili')
-    dict_content = get_content(bili_version)
+    if bili_version is None:
+        return get_not_found_response()
 
-    response = add_json_header(make_json(dict_content))
-    return response
+    content_dict = get_content(bili_version)
+
+    if content_dict is None:
+        return get_not_found_response()
+    else:
+        official_version = content_dict['officialVersion']
+        # 移除原 dict 里的 key
+        content_dict.pop('officialVersion')
+
+        content_dict = {'code': 200, 'officialVersion': official_version, 'hook_info': content_dict}
+
+        return jsonify(content_dict)
 
 
 if __name__ == '__main__':
