@@ -41,16 +41,13 @@ def get_not_found_response():
     return jsonify(json_dict)
 
 
-def add_json_header(agrs):
-    response = make_response(agrs)
-    response.headers['Content-Type'] = 'application/json; charset=utf-8'
-    return response
-
-
 @app.route('/bilineat/version')
 def newest_version():
     file = open(os.path.join(app.static_folder, 'newest'))
-    response = add_json_header(file.read())
+
+    response = make_response(file.read())
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+
     return response
 
 
@@ -69,7 +66,7 @@ def get_adapter_file():
         # 移除原 dict 里的 key
         content_dict.pop('officialVersion')
 
-        content_dict = {'code': 200, 'officialVersion': official_version, 'hook_info': content_dict}
+        content_dict = {'code': 200, 'officialVersion': official_version, 'hookInfo': content_dict}
 
         return jsonify(content_dict)
 
